@@ -358,7 +358,7 @@ export const t: TFunc = (key, params = {}) => {
   // key itself and warn in the console during development.
   const template = dict[key]
   if (template === undefined) {
-    if (import.meta.env.DEV) console.warn('eksik ceviri anahtari:', key)
+    if (import.meta.env.DEV) console.warn('missing translation key:', key)
     return key
   }
   return template

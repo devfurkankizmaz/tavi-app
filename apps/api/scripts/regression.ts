@@ -16,7 +16,7 @@ import { prisma } from '../src/db.js'
 
 const BASE = process.env.REGRESSION_BASE ?? `http://localhost:${process.env.API_PORT ?? 3457}`
 
-// ---------------------------------------------------------------- raporlama
+// ----------------------------------------------------------------- reporting
 
 interface Result {
   suite: string
@@ -53,7 +53,7 @@ async function step(name: string, fn: () => Promise<void>) {
   }
 }
 
-// ------------------------------------------------------------------ istemci
+// -------------------------------------------------------------------- client
 
 interface Session {
   label: string
@@ -105,7 +105,7 @@ async function upload(
   })
   const text = await res.text()
   let parsed: unknown = text
-  try { parsed = text ? JSON.parse(text) : null } catch { /* metin cevap */ }
+  try { parsed = text ? JSON.parse(text) : null } catch { /* a plain-text response */ }
   return { status: res.status, body: parsed }
 }
 
@@ -140,7 +140,7 @@ async function signUp(label: string): Promise<Session> {
   return { label, cookie, id: me.id, email }
 }
 
-// --------------------------------------------------------------------- run
+// ----------------------------------------------------------------------- run
 
 async function run() {
   console.log(`Regression → ${BASE}\n`)
@@ -150,7 +150,7 @@ async function run() {
   const viewer = await signUp('viewer')
   const outsider = await signUp('outsider')
 
-  // ------------------------------------------------------------ kimlik
+  // -------------------------------------------------------------------- auth
   suite('auth')
   await step('auth', async () => {
     const me = await get(owner, '/api/me')
@@ -162,11 +162,11 @@ async function run() {
     const badLogin = await post(null, '/auth/login', { email: owner.email, password: 'wrong-password' })
     checkEqual('a wrong password is refused', badLogin.status, 401)
 
-    const badBody = await post(null, '/auth/register', { email: 'gecersiz', name: '', password: '123' })
+    const badBody = await post(null, '/auth/register', { email: 'not-an-email', name: '', password: '123' })
     check('an invalid signup body is refused', badBody.status === 400, `got ${badBody.status}`)
   })
 
-  // ------------------------------------------------------------ proje
+  // ---------------------------------------------------------------- projects
   suite('projects')
   const project = (await post(owner, '/api/projects', { title: 'Regression Project' })).body
   created.projects.push(project.id)
@@ -184,7 +184,7 @@ async function run() {
     check('the project is absent from an outsider list', !list.body.some((p: any) => p.id === project.id))
   })
 
-  // ------------------------------------------------------- membership
+  // -------------------------------------------------------------- membership
   suite('membership')
   await step('membership', async () => {
     const addEditor = await post(owner, `/api/projects/${project.id}/members`, {
@@ -213,7 +213,7 @@ async function run() {
     check('an outsider cannot add themselves', outsiderJoin.status >= 400, `got ${outsiderJoin.status}`)
   })
 
-  // ------------------------------------------------------------- tasks
+  // ------------------------------------------------------------------- tasks
   suite('tasks')
   const task = (await post(owner, `/api/projects/${project.id}/tasks`, {
     title: 'Regression task',
@@ -257,7 +257,7 @@ async function run() {
     checkEqual('an outsider cannot see the task', outsiderRead.status, 404)
   })
 
-  // ------------------------------------------- subtasks and relations
+  // -------------------------------------------------- subtasks and relations
   suite('subtasks and relations')
   await step('subtasks and relations', async () => {
     const sub = await post(owner, `/api/projects/${project.id}/tasks`, {
@@ -306,7 +306,7 @@ async function run() {
     await patch(owner, `/api/tasks/${sub.body.id}`, { done: false })
   })
 
-  // ------------------------------------------------------------ etiket
+  // ------------------------------------------------------------------ labels
   suite('labels')
   await step('labels', async () => {
     const labels = await get(owner, '/api/labels')
@@ -325,7 +325,7 @@ async function run() {
     checkEqual('a label can be removed', cleared.body.labels?.length, 0)
   })
 
-  // -------------------------------------------------- atama, izleme, yorum
+  // ------------------------------------------ assignment, watching, comments
   suite('assignment and comments')
   await step('assignment and comments', async () => {
     const assigned = await patch(owner, `/api/tasks/${task.id}`, { assigneeIds: [editor.id] })
@@ -369,7 +369,7 @@ async function run() {
       !(afterDelete.body ?? []).some((a: any) => a.task?.id === doomed.body.id))
   })
 
-  // --------------------------------------------- filtering and sorting
+  // --------------------------------------------------- filtering and sorting
   suite('filtering and sorting')
   await step('filtering and sorting', async () => {
     const byType = await get(owner, `/api/tasks?projectId=${project.id}&type=BUG`)
@@ -391,7 +391,7 @@ async function run() {
     checkEqual('the page size is applied', paged.body.length, 1)
   })
 
-  // ------------------------------------------------------------ arama
+  // ------------------------------------------------------------------ search
   suite('search')
   await step('search', async () => {
     const hit = await get(owner, '/api/search?q=zibberish')
@@ -411,7 +411,7 @@ async function run() {
     checkEqual('the table is still there', stillThere.status, 200)
   })
 
-  // ------------------------------------------------------------ ekip
+  // ------------------------------------------------------------------- teams
   suite('teams')
   const team = (await post(owner, '/api/teams', { name: `Regression Team ${stamp}` })).body
   if (team?.id) created.teams.push(team.id)
@@ -440,7 +440,7 @@ async function run() {
     check('a project can be shared with a team', share.status < 300, `got ${share.status}`)
   })
 
-  // ------------------------------------------------------------ cycles
+  // ------------------------------------------------------------------ cycles
   suite('cycles')
   await step('cycles', async () => {
     const cycle = await post(owner, `/api/teams/${team.id}/cycles`, {
@@ -470,7 +470,7 @@ async function run() {
     await del(owner, `/api/cycles/${cycle.body.id}`)
   })
 
-  // --------------------------------------------------------- documents
+  // --------------------------------------------------------------- documents
   suite('documents')
   await step('documents', async () => {
     const doc = await post(owner, `/api/projects/${project.id}/documents`, {
@@ -506,7 +506,7 @@ async function run() {
     await del(owner, `/api/documents/${doc.body.id}`)
   })
 
-  // ------------------------------------------------------------ dosya ekleri
+  // ------------------------------------------------------------- attachments
   suite('attachments')
   await step('attachments', async () => {
     const secret = `gizli-icerik-${stamp}`
@@ -553,11 +553,11 @@ async function run() {
     checkEqual('refused deletions leave the file alone', stillThere.status, 200)
 
     // The server must survive a file going missing from disk
-    const orphan = await upload(owner, `/api/tasks/${task.id}/attachments`, 'kayip.txt', 'kaybolacak')
+    const orphan = await upload(owner, `/api/tasks/${task.id}/attachments`, 'lost.txt', 'about to go missing')
     if (orphan.status === 201) {
       await prisma.attachment.update({
         where: { id: orphan.body.id },
-        data: { storedName: 'diskte-olmayan-dosya' },
+        data: { storedName: 'a-name-with-no-file-behind-it' },
       })
       const missing = await download(owner, orphan.body.id)
       check('a missing file does not take the server down', missing.status >= 400 && missing.status < 600,
@@ -574,7 +574,7 @@ async function run() {
     checkEqual('a deleted attachment cannot be downloaded', afterDelete.status, 404)
   })
 
-  // ------------------------------------------------------------- trash
+  // ------------------------------------------------------------------- trash
   suite('trash')
   await step('trash', async () => {
     const victim = await post(owner, `/api/projects/${project.id}/tasks`, { title: 'To be deleted' })
@@ -608,7 +608,7 @@ async function run() {
       !(reallyGone.body.tasks ?? []).some((t: any) => t.id === victim.body.id))
   })
 
-  // ------------------------------------------------------------ gelen kutusu
+  // ------------------------------------------------------------------- inbox
   suite('inbox')
   await step('inbox', async () => {
     // The editor assigns to the owner and comments twice; it should land in their inbox
@@ -669,7 +669,7 @@ async function run() {
       `affected ${foreign.body.updated}`)
   })
 
-  // ------------------------------------------ sharing, ICS and export
+  // ------------------------------------------------- sharing, ICS and export
   suite('sharing and export')
   await step('sharing and export', async () => {
     const share = await post(owner, `/api/projects/${project.id}/link-shares`, { role: 'VIEWER' })
@@ -689,7 +689,7 @@ async function run() {
     check('the ICS feed is a calendar', String(ics.body).startsWith('BEGIN:VCALENDAR'),
       String(ics.body).slice(0, 40))
 
-    const badIcs = await get(null, '/public/ics/gecersiz.ics')
+    const badIcs = await get(null, '/public/ics/not-a-real-token.ics')
     check('an invalid ICS token is refused', badIcs.status >= 400, `got ${badIcs.status}`)
 
     const exported = await get(owner, '/api/export')
@@ -697,7 +697,7 @@ async function run() {
     check('the export contains projects', JSON.stringify(exported.body).includes(project.id))
   })
 
-  // ------------------------------------------------------------ API jetonu
+  // -------------------------------------------------------------- API tokens
   suite('API tokens')
   await step('API tokens', async () => {
     const token = await post(owner, '/api/me/tokens', { name: 'regression' })
@@ -710,7 +710,7 @@ async function run() {
     checkEqual('a token authenticates', withToken.status, 200)
 
     const badToken = await fetch(`${BASE}/api/me`, {
-      headers: { Authorization: 'Bearer gecersiz-jeton' },
+      headers: { Authorization: 'Bearer not-a-real-token' },
     })
     checkEqual('an invalid token is refused', badToken.status, 401)
 
@@ -723,19 +723,19 @@ async function run() {
     checkEqual('a revoked token stops working', afterRevoke.status, 401)
   })
 
-  // ------------------------------------------------------------ hesap
+  // ----------------------------------------------------------------- account
   suite('account')
   await step('account', async () => {
     const renamed = await patch(owner, '/api/me', { name: 'Regression Owner' })
     checkEqual('the name can be changed', renamed.body.name, 'Regression Owner')
 
     const wrongCurrent = await post(owner, '/api/me/password', {
-      current: 'yanlis', next: 'yepyeni-parola-1',
+      current: 'wrong-password', next: 'brand-new-password-1',
     })
     check('a wrong current password is refused', wrongCurrent.status >= 400, `got ${wrongCurrent.status}`)
 
     const shortPassword = await post(owner, '/api/me/password', {
-      current: 'regression-pass-1', next: 'kisa',
+      current: 'regression-pass-1', next: 'short',
     })
     checkEqual('a short password is refused', shortPassword.status, 400)
 
@@ -752,7 +752,7 @@ async function run() {
     await del(owner, `/api/favorites/project/${project.id}`)
   })
 
-  // ------------------------------------------------------- proje silme
+  // -------------------------------------------------------- project deletion
   suite('project lifecycle')
   await step('project lifecycle', async () => {
     const archived = await patch(owner, `/api/projects/${project.id}`, { archived: true })
@@ -890,7 +890,7 @@ async function run() {
   report()
 }
 
-// ------------------------------------------------------------------ temizlik
+// ------------------------------------------------------------------- cleanup
 
 async function cleanup() {
   // Straight from the database, so soft-deleted rows leave no trace either

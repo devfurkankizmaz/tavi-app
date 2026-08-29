@@ -23,7 +23,7 @@
   /* a thin highlight along the top edge, which gives a surface some depth */
   --specular: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
-  /* metin */
+  /* text */
   --text: #191713;
   --text-2: #524d45;
   --muted: #8b8378;

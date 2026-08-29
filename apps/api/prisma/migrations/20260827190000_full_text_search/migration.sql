@@ -1,4 +1,4 @@
--- Tam metin arama.
+-- Full-text search.
 --
 -- The 'simple' dictionary is deliberate: content is mixed-language and
 -- Postgres ships no stemmer for several of those languages. Choosing

@@ -71,7 +71,7 @@ authRouter.get('/google/callback', async (req, res) => {
     const { tokens } = await oauth.getToken(code)
     const ticket = await oauth.verifyIdToken({ idToken: tokens.id_token!, audience: process.env.GOOGLE_CLIENT_ID })
     const p = ticket.getPayload()
-    if (!p?.sub || !p.email) return res.status(400).send('Google profili eksik')
+    if (!p?.sub || !p.email) return res.status(400).send('Google profile is missing an id or email')
 
     // If a local account already uses this email, attach the Google identity to it
     const existing = await prisma.user.findUnique({ where: { email: p.email } })
@@ -95,7 +95,7 @@ authRouter.get('/google/callback', async (req, res) => {
   }
 })
 
-// ---- Yerel hesap ----
+// ---- Local account ----
 
 const registerSchema = z.object({
   email: z.string().email(),

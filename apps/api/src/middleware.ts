@@ -29,7 +29,7 @@ export function fail(
   return res.status(status).json({ error: t(key), code, ...(detail ? { detail } : {}) })
 }
 
-/** Cookie JWT veya `Authorization: Bearer <api-token>` kabul eder. */
+/** Accepts either the cookie JWT or `Authorization: Bearer <api-token>`. */
 export async function requireUser(req: Request, res: Response, next: NextFunction) {
   const cookieToken = req.cookies?.token as string | undefined
   if (cookieToken) {
