@@ -82,7 +82,7 @@ teamsRouter.delete('/teams/:id', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Davet ----
+// ---- Invitations ----
 
 teamsRouter.post('/teams/:id/invites', async (req, res) => {
   const access = await teamAccess(req.uid!, req.params.id)
@@ -131,7 +131,7 @@ teamsRouter.patch('/teams/:id/members/:userId', async (req, res) => {
   }))
 })
 
-// ---- Slack entegrasyonu ----
+// ---- Slack integration ----
 
 teamsRouter.put('/teams/:id/slack', async (req, res) => {
   const access = await teamAccess(req.uid!, req.params.id)

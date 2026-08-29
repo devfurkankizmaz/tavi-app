@@ -75,7 +75,7 @@ projectsRouter.post('/projects', async (req, res) => {
   res.status(201).json(project)
 })
 
-// ---- Detay ----
+// ---- Detail ----
 
 projectsRouter.get('/projects/:id', async (req, res) => {
   const uid = req.uid!

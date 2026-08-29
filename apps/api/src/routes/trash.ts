@@ -30,7 +30,7 @@ async function deletedProjectRole(uid: string, projectId: string) {
   return project.members[0]?.role ?? project.teamShares[0]?.role ?? null
 }
 
-// ---- Listeleme ----
+// ---- Listing ----
 
 trashRouter.get('/trash', async (req, res) => {
   const uid = req.uid!
@@ -82,7 +82,7 @@ trashRouter.get('/trash', async (req, res) => {
   })
 })
 
-// ---- Geri alma ----
+// ---- Restoring ----
 
 trashRouter.post('/trash/task/:id/restore', async (req, res) => {
   const task = await prisma.task.findUnique({ where: { id: req.params.id }, select: { projectId: true } })

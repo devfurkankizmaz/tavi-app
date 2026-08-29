@@ -19,7 +19,7 @@ const escape = (s: string) =>
 export interface MailContent {
   /** The single-line heading above the body. */
   heading: string
-  /** Bir ya da iki paragraf. */
+  /** One or two paragraphs. */
   lines: string[]
   /** Small fact rows like a task key: ["Due", "Sep 4"] */
   facts?: [string, string][]

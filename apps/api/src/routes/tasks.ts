@@ -69,7 +69,7 @@ async function reachableCycleIds(uid: string): Promise<string[]> {
   return cycles.map(c => c.id)
 }
 
-// ---- Arama / filtreli listeleme ----
+// ---- Search and filtered listing ----
 
 tasksRouter.get('/tasks', async (req, res) => {
   const uid = req.uid!
@@ -191,7 +191,7 @@ tasksRouter.post('/projects/:id/tasks', async (req, res) => {
   res.status(201).json(serializeTask(task))
 })
 
-// ---- Detay ----
+// ---- Detail ----
 
 tasksRouter.get('/tasks/:id', async (req, res) => {
   const tr = await taskRole(req.uid!, req.params.id)
@@ -418,7 +418,7 @@ tasksRouter.delete('/tasks/:id/watch', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Yorumlar ----
+// ---- Comments ----
 
 tasksRouter.post('/tasks/:id/comments', async (req, res) => {
   const tr = await taskRole(req.uid!, req.params.id)
@@ -474,7 +474,7 @@ tasksRouter.delete('/comments/:id', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Dosya ekleri ----
+// ---- Attachments ----
 
 tasksRouter.post('/tasks/:id/attachments', upload.single('file'), async (req, res) => {
   const tr = await taskRole(req.uid!, req.params.id)
@@ -594,8 +594,6 @@ tasksRouter.delete('/relations/:id', async (req, res) => {
 /**
  * Finishing a task can free the work it was blocking. When something is
  * freed, its watchers hear about it: "your turn" is the one piece of news
- * elle takip etmesi gerekmeyen tek bilgidir.
- *
  * nobody should have to poll for. Only tasks whose *last* blocker cleared
  * are announced; anything still waiting would be a false alarm.
  */

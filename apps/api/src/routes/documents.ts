@@ -150,7 +150,7 @@ documentsRouter.delete('/documents/:id/tasks/:taskId', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Yorumlar ----
+// ---- Comments ----
 
 documentsRouter.post('/documents/:id/comments', async (req, res) => {
   const dr = await documentRole(req.uid!, req.params.id)
@@ -167,7 +167,7 @@ documentsRouter.post('/documents/:id/comments', async (req, res) => {
   res.status(201).json(comment)
 })
 
-// ---- Dosya ekleri ----
+// ---- Attachments ----
 
 documentsRouter.post('/documents/:id/attachments', upload.single('file'), async (req, res) => {
   const dr = await documentRole(req.uid!, req.params.id)

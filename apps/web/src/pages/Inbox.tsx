@@ -47,7 +47,7 @@ interface InboxData {
 }
 
 /**
- * Gelen kutusu.
+ * The inbox.
  *
  * The bell answers "what happened?"; this screen answers "what needs me?".
  * Notifications about one task collapse into a single row, that row shows the

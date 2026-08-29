@@ -175,7 +175,7 @@ accountRouter.delete('/me/tokens/:id', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Bildirimler ----
+// ---- Notifications ----
 
 accountRouter.get('/notifications', async (req, res) => {
   const [items, unread] = await Promise.all([
@@ -198,7 +198,7 @@ accountRouter.post('/notifications/read', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Favoriler ----
+// ---- Favourites ----
 
 accountRouter.post('/favorites', async (req, res) => {
   const body = z.object({ kind: z.enum(['project', 'task']), targetId: z.string() }).safeParse(req.body)
@@ -218,7 +218,7 @@ accountRouter.delete('/favorites/:kind/:targetId', async (req, res) => {
   res.json({ ok: true })
 })
 
-// ---- Davetler (gelen kutusu) ----
+// ---- Invitations (inbox) ----
 
 accountRouter.get('/invites', async (req, res) => {
   const me = await prisma.user.findUnique({ where: { id: req.uid! }, select: { email: true } })

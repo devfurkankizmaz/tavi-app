@@ -46,7 +46,7 @@ function summarize(tasks: { status: string; done: boolean; estimate: number | nu
   }
 }
 
-// ---- Listeleme ----
+// ---- Listing ----
 
 cyclesRouter.get('/cycles', async (req, res) => {
   const cycles = await prisma.cycle.findMany({
@@ -85,7 +85,7 @@ cyclesRouter.post('/teams/:teamId/cycles', async (req, res) => {
   res.status(201).json(cycle)
 })
 
-// ---- Detay / pano ----
+// ---- Detail and board ----
 
 cyclesRouter.get('/cycles/:id', async (req, res) => {
   const cycle = await reachableCycle(req.uid!, req.params.id)

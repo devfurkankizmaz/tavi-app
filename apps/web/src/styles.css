@@ -169,10 +169,10 @@ a:hover { text-decoration: underline; text-underline-offset: 2px; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* ================================ Marka ================================ */
+/* ================================== Brand =================================== */
 .wordmark { font-weight: 700; letter-spacing: -0.032em; color: var(--text); }
 
-/* ================================ Login ================================ */
+/* ================================== Login =================================== */
 .login-page { min-height: 100%; display: grid; place-items: center; padding: 2rem 1.25rem; }
 .login-card {
   width: 100%;
@@ -245,7 +245,7 @@ a:hover { text-decoration: underline; text-underline-offset: 2px; }
 }
 .btn-dev:hover { background: var(--surface-2); color: var(--text-2); }
 
-/* ================================ Kabuk ================================ */
+/* ================================== Shell =================================== */
 .shell { display: flex; height: 100%; }
 
 .sidebar {
@@ -435,7 +435,7 @@ a:hover { text-decoration: underline; text-underline-offset: 2px; }
 .content-inner.wide { max-width: none; }
 @keyframes enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 
-/* ========================= Surfaces and controls ========================= */
+/* ========================== Surfaces and controls =========================== */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm), var(--specular); }
 
 .btn {
@@ -548,7 +548,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .section-title:first-child { margin-top: 0; }
 .empty { padding: 2.3rem 1.2rem; color: var(--muted); font-size: var(--t-sub); text-align: center; text-wrap: balance; }
 
-/* ================================ Chip ================================ */
+/* =================================== Chip =================================== */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -622,7 +622,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .progress { height: 5px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
 .progress > div { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width var(--med); }
 
-/* ================================ Durum ================================ */
+/* ================================== Status ================================== */
 .status-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: currentColor; }
 .status-pill {
   display: inline-flex;
@@ -644,7 +644,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .st-review { background: var(--warn-soft); color: var(--warn); }
 .st-done { background: var(--ok-soft); color: var(--ok); }
 
-/* ================================ Filtreler ================================ */
+/* ================================= Filters ================================== */
 .filterbar { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
 .filterbar .input { width: auto; }
 .filterbar select, .settings-section select {
@@ -663,7 +663,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 }
 .filterbar select:focus { border-color: var(--accent); box-shadow: 0 0 0 3.5px var(--accent-ring); }
 
-/* ================================ Task list ================================ */
+/* ================================ Task list ================================= */
 .add-task { display: flex; gap: 0.45rem; padding: 0.7rem; border-bottom: 1px solid var(--divider); }
 .task-list { padding: 0.3rem; }
 .task-row {
@@ -688,7 +688,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .task-row .del:hover { color: var(--danger); background: var(--danger-soft); }
 .task-row .indent { width: 22px; flex: 0 0 auto; }
 
-/* ================================ Kanban ================================ */
+/* ================================== Kanban ================================== */
 .kanban { display: flex; gap: 0.75rem; align-items: flex-start; overflow-x: auto; padding-bottom: 1rem; }
 .kb-col {
   width: 290px;
@@ -726,7 +726,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .kb-add:hover { background: var(--surface); color: var(--text); }
 .kb-new-col { width: 248px; flex: 0 0 auto; }
 
-/* ================================ Tablo ================================ */
+/* ================================== Table =================================== */
 .tbl-wrap { overflow-x: auto; }
 .tbl { width: 100%; border-collapse: collapse; font-size: var(--t-sub); }
 .tbl th {
@@ -749,7 +749,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .tbl tbody tr:hover { background: var(--surface-2); }
 .tbl .title-cell { max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ================================ Gantt ================================ */
+/* ================================== Gantt =================================== */
 .gantt { overflow-x: auto; padding: 0.7rem; }
 .gantt-grid { position: relative; min-width: 100%; }
 .gantt-months { display: flex; margin-left: 220px; border-bottom: 1px solid var(--border); }
@@ -781,7 +781,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .gantt-bar.done { opacity: 0.4; }
 .gantt-today { position: absolute; top: 0; bottom: 0; width: 1.5px; background: var(--danger); opacity: 0.5; }
 
-/* ================================ Documents ================================ */
+/* ================================ Documents ================================= */
 .docs { display: flex; gap: 1rem; align-items: flex-start; }
 .docs-list {
   width: 252px;
@@ -869,7 +869,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .doc-task:hover .del { opacity: 1; }
 .doc-task .del:hover { color: var(--danger); background: var(--danger-soft); }
 
-/* =============================== Task panel =============================== */
+/* ================================ Task panel ================================ */
 .panel-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(10, 8, 6, 0.32); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); animation: fade-in 160ms var(--ease); }
 .task-panel {
   position: fixed;
@@ -969,7 +969,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .activity .what { flex: 1; }
 .activity .when { color: var(--faint); font-size: var(--t-micro); white-space: nowrap; }
 
-/* ============================ Popover / Modal ============================ */
+/* ============================= Popover / Modal ============================== */
 .popover-wrap { position: relative; display: inline-block; }
 .popover {
   position: absolute;
@@ -1011,7 +1011,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .modal-head h3 { font-size: var(--t-section); font-weight: 660; }
 .modal .actions { display: flex; justify-content: flex-end; gap: 0.45rem; margin-top: 1rem; }
 
-/* ============================== Komut paleti ============================== */
+/* ============================= Command palette ============================== */
 .cmd-backdrop { position: fixed; inset: 0; z-index: 90; display: flex; justify-content: center; padding-top: 11vh; background: rgba(10, 8, 6, 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: fade-in 140ms var(--ease); }
 .cmd {
   width: min(600px, 94vw);
@@ -1036,7 +1036,7 @@ textarea.input { height: auto; min-height: 92px; padding: 0.55rem 0.75rem; line-
 .cmd-hint { color: var(--faint); font-size: var(--t-micro); }
 .cmd-row.active .cmd-hint { color: inherit; opacity: 0.75; }
 
-/* ================================ Klavye ================================ */
+/* ================================= Keyboard ================================= */
 kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--faint); font-family: inherit; font-size: var(--t-micro); font-weight: 600; }
 .search-kbd { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .topbar-right .btn kbd { margin-left: 0.1rem; }
@@ -1045,7 +1045,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .keys-row:last-child { border-bottom: none; }
 .keys-row .combo { display: inline-flex; gap: 0.18rem; }
 
-/* ============================ Bildirim / davet ============================ */
+/* ======================= Notifications / invitations ======================== */
 .notif-item { display: flex; gap: 0.5rem; padding: 0.5rem; border-radius: var(--r-xs); font-size: var(--t-sub); cursor: pointer; transition: background var(--fast); }
 .notif-item:hover { background: var(--surface-3); }
 .notif-item.unread { background: var(--accent-soft); }
@@ -1055,7 +1055,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .invite-card .grow { flex: 1; min-width: 140px; font-size: var(--t-sub); }
 .invite-card .sub { color: var(--muted); font-size: var(--t-caption); }
 
-/* ================================ Kartlar ================================ */
+/* ================================== Cards =================================== */
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 0.7rem; }
 .project-card {
   position: relative;
@@ -1104,7 +1104,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .member-row .mail { color: var(--faint); font-size: var(--t-caption); }
 .member-row select { height: 27px; padding: 0 0.45rem; border: 1px solid var(--border-strong); border-radius: var(--r-xs); background: var(--surface); font-size: var(--t-caption); }
 
-/* ================================ Toast ================================ */
+/* ================================== Toast =================================== */
 .toasts { position: fixed; bottom: calc(1.2rem + var(--safe-b)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; pointer-events: none; }
 .toast { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 0.6rem 0.5rem 1rem; background: var(--veil-strong); -webkit-backdrop-filter: saturate(180%) blur(26px); backdrop-filter: saturate(180%) blur(26px); border: 1px solid var(--border); border-radius: 99px; box-shadow: var(--shadow-lg), var(--specular); font-size: var(--t-sub); font-weight: 540; animation: toast-in 260ms var(--ease-out); }
 .toast-action {
@@ -1124,14 +1124,14 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .toast.ok { border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
 @keyframes toast-in { from { transform: translateY(12px) scale(0.95); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* ================================ Ayarlar ================================ */
+/* ================================= Settings ================================= */
 .settings-section { padding-bottom: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--divider); }
 .settings-section:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
 .settings-section h3 { margin-bottom: 0.5rem; font-size: var(--t-section); font-weight: 650; }
 .settings-section > p { margin: 0 0 0.55rem; max-width: 60ch; color: var(--muted); font-size: var(--t-caption); }
 .token-value { padding: 0.4rem 0.6rem; border-radius: var(--r-xs); background: var(--surface-3); font-family: var(--mono); font-size: var(--t-caption); word-break: break-all; }
 
-/* ========================= Mobil: alt sekme + sayfa ========================= */
+/* ====================== Mobile: bottom tabs and pages ======================= */
 .mobile-nav { display: none; }
 .sheet-backdrop { display: none; }
 
@@ -1285,7 +1285,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
   .welcome-tour { grid-template-columns: 1fr; }
 }
 
-/* ============================== Profil ============================== */
+/* ================================= Profile ================================== */
 .avatar.interactive { padding: 0; border: none; cursor: pointer; transition: transform var(--fast), box-shadow var(--fast); }
 .avatar.interactive:hover { transform: scale(1.08); box-shadow: 0 0 0 2px var(--accent-ring); }
 .avatar.interactive:active { transform: scale(0.96); }
@@ -1310,7 +1310,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .chip-row .chip { text-decoration: none; }
 .chip-row .chip:hover { background: var(--surface-4); text-decoration: none; }
 
-/* ============================== Empty states ============================== */
+/* =============================== Empty states =============================== */
 .empty-state { display: flex; flex-direction: column; align-items: center; padding: 2.2rem 1.2rem; text-align: center; }
 .empty-state.illustrated { padding-top: 2.8rem; }
 .empty-art { width: 132px; height: 132px; margin-bottom: 0.9rem; opacity: 0.92; filter: drop-shadow(0 12px 26px rgba(224, 154, 52, 0.22)); animation: mascot-in 460ms var(--ease-out); }
@@ -1318,7 +1318,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .empty-body { max-width: 44ch; margin: 0.35rem 0 0; color: var(--muted); font-size: var(--t-sub); text-wrap: balance; }
 .empty-action { margin-top: 1.1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
 
-/* ================================= Welcome ================================= */
+/* ================================= Welcome ================================== */
 .hello { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.5rem; }
 .hello .greeting { margin: 0 0 0.15rem; }
 .mascot { flex: 0 0 auto; filter: drop-shadow(0 8px 20px rgba(224, 154, 52, 0.28)); }
@@ -1357,7 +1357,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
   .welcome { padding: 1.5rem 0.5rem 0.5rem; }
 }
 
-/* ============================== Asistan ============================== */
+/* ================================ Assistant ================================= */
 .assistant-bubble {
   position: fixed;
   right: 1.4rem;
@@ -1758,7 +1758,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .settings-facts span { color: var(--muted); }
 .settings-note { margin: 0; color: var(--faint); font-size: var(--t-caption); }
 
-/* ============================== Takvim ============================== */
+/* ================================= Calendar ================================= */
 .calendar { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .cal-head { display: flex; align-items: center; gap: 0.35rem; }
@@ -1893,7 +1893,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
   .cal-head h3 { min-width: 0; flex: 1; text-align: left; }
 }
 
-/* ============================== Arama ============================== */
+/* ================================== Search ================================== */
 .search-page-input { max-width: 520px; margin-bottom: 0.9rem; font-size: var(--t-body); }
 .search-hint { margin: 0 0 1rem; color: var(--muted); font-size: var(--t-sub); }
 
@@ -1949,7 +1949,7 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
   font-size: var(--t-caption);
 }
 
-/* ============================== Gelen kutusu ============================== */
+/* ================================== Inbox =================================== */
 .inbox-tabs { display: flex; gap: 0.25rem; margin-bottom: 0.9rem; }
 .inbox-tabs button {
   display: flex;

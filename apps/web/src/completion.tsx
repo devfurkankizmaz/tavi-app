@@ -10,7 +10,7 @@ const LINGER_MS = 2600
 interface ToggleOpts {
   /** Moves the row to its new state at once, without waiting on the server. */
   optimistic?: (done: boolean) => void
-  /** Bekleme bitince listeyi tazeler. */
+  /** Refreshes the list when the wait is over. */
   reload?: () => void | Promise<unknown>
 }
 
