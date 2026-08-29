@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/devfurkankizmaz/tavi-app/discussions
+    about: Ask about setting Tavi up, or float an idea before it becomes an issue.
+  - name: Security vulnerability
+    url: https://github.com/devfurkankizmaz/tavi-app/security/advisories/new
+    about: Report privately. Please do not open a public issue for a vulnerability.

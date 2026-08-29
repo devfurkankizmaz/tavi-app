@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # One npm ecosystem entry covers the workspaces too, since the lockfile is at the root
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # A pull request per package is noise on a project this size
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

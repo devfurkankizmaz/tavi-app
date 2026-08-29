@@ -1,0 +1,8 @@
+# Normalise line endings for everything text-like
+* text=auto eol=lf
+
+# Generated; keep it out of diffs and language statistics
+package-lock.json linguist-generated=true -diff
+
+# Binary assets
+*.png binary

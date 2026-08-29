@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A new push supersedes the run still going for the same ref
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate --schema apps/api/prisma/schema.prisma
+      - run: npm run check
+      - run: npm run build -w @tavi/web
+
+  regression:
+    name: End-to-end regression
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: tavi
+          POSTGRES_PASSWORD: tavi
+          POSTGRES_DB: tavi
+        ports: ['5432:5432']
+        # Do not run migrations before the database is genuinely ready
+        options: >-
+          --health-cmd "pg_isready -U tavi"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://tavi:tavi@localhost:5432/tavi
+      JWT_SECRET: ci-only-secret-not-used-anywhere-else
+      WEB_ORIGIN: http://localhost:5173
+      REGISTRATION_ENABLED: '1'
+      API_PORT: '3457'
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy --schema apps/api/prisma/schema.prisma
+      - run: npx prisma generate --schema apps/api/prisma/schema.prisma
+
+      - name: Start API
+        run: npm run dev -w @tavi/api &
+
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 40); do
+            if curl -sf http://localhost:3457/auth/config > /dev/null; then
+              echo "API ready"; exit 0
+            fi
+            sleep 1
+          done
+          echo "API did not start within 40 seconds"; exit 1
+
+      - run: npm run regression
+
+  docker:
+    name: Production images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build API image
+        run: docker build -f apps/api/Dockerfile -t tavi-api .
+      - name: Build web image
+        run: docker build -f apps/web/Dockerfile -t tavi-web .

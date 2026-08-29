@@ -1,0 +1,75 @@
+# Tavi self-host / prod stack
+# Usage:
+#   cp .env.prod.example .env.prod   # then fill it in
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tavi
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: tavi
+    volumes:
+      - tavi_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tavi -d tavi"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://tavi:${DB_PASSWORD}@db:5432/tavi
+      JWT_SECRET: ${JWT_SECRET}
+      WEB_ORIGIN: ${PUBLIC_ORIGIN}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN}
+      COOKIE_SECURE: ${COOKIE_SECURE:-1}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-1}
+      # Optional; leave empty and the Google button never appears on the login screen
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Optional; without SMTP email is skipped and in-app notifications still work
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-0}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      # Optional; without a key the assistant bubble never appears
+      AGENT_API_KEY: ${AGENT_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AGENT_PROVIDER: ${AGENT_PROVIDER:-}
+      AGENT_MODEL: ${AGENT_MODEL:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      AGENT_EFFORT: ${AGENT_EFFORT:-medium}
+      AGENT_MAX_STEPS: ${AGENT_MAX_STEPS:-8}
+      AGENT_MAX_WRITES: ${AGENT_MAX_WRITES:-20}
+      AGENT_MAX_BULK: ${AGENT_MAX_BULK:-20}
+      AGENT_TIMEOUT_MS: ${AGENT_TIMEOUT_MS:-90000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Developer sign-in is never enabled in production
+      DEV_LOGIN: "0"
+    volumes:
+      - tavi_files:/data/attachments
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      - api
+
+volumes:
+  tavi_db:
+  tavi_files:

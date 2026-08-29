@@ -1,0 +1,19 @@
+# Environment files; the .env*.example templates stay in the repo
+.env
+.env.prod
+apps/api/.env
+apps/web/.env
+
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Runtime data
+data/
+apps/api/data/
+files/
+
+# Operating system and editors
+.DS_Store
+*.log

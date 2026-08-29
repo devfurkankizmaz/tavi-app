@@ -1,0 +1,54 @@
+{
+  "name": "tavi",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @tavi/api\" \"npm run dev -w @tavi/web\"",
+    "db:migrate": "npm run db:migrate -w @tavi/api",
+    "db:generate": "npm run db:generate -w @tavi/api",
+    "check": "npm run typecheck -w @tavi/api && npm run typecheck -w @tavi/web",
+    "regression": "npm run regression -w @tavi/api",
+    "db:seed": "npm run db:seed -w @tavi/api",
+    "screenshots": "npm run screenshots -w @tavi/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "playwright-core": "^1.62.1"
+  },
+  "description": "Open-source, self-hosted task tracking for small teams. Projects, cycles, docs and an inbox, in one Docker command.",
+  "keywords": [
+    "task-tracker",
+    "project-management",
+    "self-hosted",
+    "open-source",
+    "kanban",
+    "gantt",
+    "sprint",
+    "team-collaboration",
+    "issue-tracker",
+    "productivity",
+    "typescript",
+    "react",
+    "express",
+    "prisma",
+    "postgresql",
+    "vikunja-alternative",
+    "linear-alternative",
+    "jira-alternative"
+  ],
+  "license": "MIT",
+  "author": "Furkan Kızmaz",
+  "homepage": "https://github.com/devfurkankizmaz/tavi-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devfurkankizmaz/tavi-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devfurkankizmaz/tavi-app/issues"
+  }
+}

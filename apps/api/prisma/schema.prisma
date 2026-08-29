@@ -1,0 +1,459 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+/// A shared workflow across projects, independent of kanban columns.
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+/// The kind of work; drives its icon, colour and description template.
+enum TaskType {
+  FEATURE
+  BUG
+  TASK
+  CHORE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  avatarUrl    String?
+  googleId     String?  @unique
+  passwordHash String?
+  icsToken     String   @unique @default(cuid())
+  createdAt    DateTime @default(now())
+
+  /// Hour of the day, UTC, at which to send the unread digest. Null is off.
+  digestHour   Int?
+  /// Guards against a restart sending a second digest the same day.
+  lastDigestAt DateTime?
+
+  ownedProjects           Project[]                @relation("owner")
+  memberships             ProjectMember[]
+  teamMemberships         TeamMember[]
+  createdTeams            Team[]
+  assignments             TaskAssignee[]
+  labels                  Label[]
+  comments                Comment[]
+  attachments             Attachment[]
+  notifications           Notification[]
+  apiTokens               ApiToken[]
+  favorites               Favorite[]
+  createdTasks            Task[]
+  sentInvitations         Invitation[]
+  watching                TaskWatcher[]
+  activities              Activity[]
+  documents               Document[]
+  savedViews              SavedView[]
+  notificationPreferences NotificationPreference[]
+}
+
+model Team {
+  id              String             @id @default(cuid())
+  name            String
+  createdBy       User               @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById     String
+  members         TeamMember[]
+  projectShares   ProjectTeamShare[]
+  invitations     Invitation[]
+  cycles          Cycle[]
+  /// Slack incoming webhook; notifications land in the team's channel
+  slackWebhookUrl String?
+  createdAt       DateTime           @default(now())
+}
+
+/// A weekly or two-week working cycle. It belongs to a team, so one cycle
+/// can gather tasks from several projects.
+model Cycle {
+  id        String    @id @default(cuid())
+  name      String
+  goal      String    @default("")
+  startsAt  DateTime
+  endsAt    DateTime
+  closedAt  DateTime?
+  team      Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  tasks     Task[]
+  createdAt DateTime  @default(now())
+
+  @@index([teamId, startsAt])
+}
+
+model TeamMember {
+  team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  admin  Boolean @default(false)
+
+  @@id([teamId, userId])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  /// Task key prefix; yields short, distinctive ids like TAV-12
+  key         String   @unique
+  title       String
+  description String   @default("")
+  color       String   @default("#e09a34")
+  archived    Boolean  @default(false)
+  position    Float    @default(0)
+  owner       User     @relation("owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+  createdAt   DateTime @default(now())
+
+  /// Deleted records wait 30 days in trash, then go for good
+  deletedAt DateTime?
+
+  members     ProjectMember[]
+  teamShares  ProjectTeamShare[]
+  linkShares  LinkShare[]
+  buckets     Bucket[]
+  tasks       Task[]
+  invitations Invitation[]
+  activities  Activity[]
+  documents   Document[]
+  savedViews  SavedView[]
+}
+
+model ProjectMember {
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  role      Role    @default(EDITOR)
+
+  @@id([projectId, userId])
+}
+
+model ProjectTeamShare {
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  role      Role    @default(EDITOR)
+
+  @@id([projectId, teamId])
+}
+
+model LinkShare {
+  id        String   @id @default(cuid())
+  token     String   @unique @default(cuid())
+  role      Role     @default(VIEWER)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  createdAt DateTime @default(now())
+}
+
+model Bucket {
+  id           String  @id @default(cuid())
+  title        String
+  position     Float   @default(0)
+  limit        Int     @default(0)
+  isDoneBucket Boolean @default(false)
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
+  tasks        Task[]
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  number      Int
+  title       String
+  description String     @default("")
+  status      TaskStatus @default(TODO)
+  type        TaskType   @default(TASK)
+  done        Boolean    @default(false)
+  doneAt      DateTime?
+  /// Point estimate, used when planning a cycle
+  estimate    Int?
+  priority    Int        @default(0)
+  percentDone Int        @default(0)
+  color       String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  repeatAfter Int        @default(0)
+  position    Float      @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  bucket      Bucket?   @relation(fields: [bucketId], references: [id], onDelete: SetNull)
+  bucketId    String?
+  parent      Task?     @relation("subtasks", fields: [parentId], references: [id], onDelete: SetNull)
+  parentId    String?
+  subtasks    Task[]    @relation("subtasks")
+  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  cycle       Cycle?    @relation(fields: [cycleId], references: [id], onDelete: SetNull)
+  cycleId     String?
+  /// The feature document this task belongs to
+  document    Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  documentId  String?
+
+  relationsFrom TaskRelation[] @relation("from")
+  relationsTo   TaskRelation[] @relation("to")
+  assignees     TaskAssignee[]
+  labels        TaskLabel[]
+  comments      Comment[]
+  attachments   Attachment[]
+  reminders     Reminder[]
+  watchers      TaskWatcher[]
+  activities    Activity[]
+
+  /// Full-text index, generated by Postgres and read through raw queries
+  search Unsupported("tsvector")?
+
+  @@unique([projectId, number])
+  @@index([projectId, done])
+  @@index([dueDate])
+  @@index([status])
+  @@index([type])
+  @@index([cycleId])
+  @@index([documentId])
+  @@index([deletedAt])
+}
+
+model TaskRelation {
+  id     String @id @default(cuid())
+  kind   String @default("related")
+  from   Task   @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
+  fromId String
+  to     Task   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
+  toId   String
+
+  @@unique([fromId, toId, kind])
+}
+
+model TaskAssignee {
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@id([taskId, userId])
+}
+
+model Label {
+  id      String      @id @default(cuid())
+  title   String
+  color   String      @default("#8a8278")
+  owner   User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  tasks   TaskLabel[]
+
+  @@unique([ownerId, title])
+}
+
+model TaskLabel {
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId  String
+  label   Label  @relation(fields: [labelId], references: [id], onDelete: Cascade)
+  labelId String
+
+  @@id([taskId, labelId])
+}
+
+/// Lets someone follow a task without being assigned; they hear about every change.
+/// Creating, being assigned or commenting starts a watch automatically.
+/// A document on a project: a feature definition, a decision record, a note.
+/// It can nest, link to tasks, and carry comments and files.
+model Document {
+  id          String       @id @default(cuid())
+  title       String
+  content     String       @default("")
+  icon        String?
+  position    Float        @default(0)
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    String?
+  parent      Document?    @relation("docTree", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId    String?
+  children    Document[]   @relation("docTree")
+  tasks       Task[]
+  comments    Comment[]
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  /// Tam metin arama indeksi
+  search Unsupported("tsvector")?
+
+  @@index([projectId, position])
+  @@index([deletedAt])
+}
+
+model TaskWatcher {
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@id([taskId, userId])
+}
+
+/// Who changed what and when: the audit trail at task and project level.
+model Activity {
+  id        String   @id @default(cuid())
+  kind      String
+  meta      Json     @default("{}")
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    String?
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId   String?
+  createdAt DateTime @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([taskId, createdAt])
+}
+
+model Comment {
+  id         String    @id @default(cuid())
+  text       String
+  task       Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId     String?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String?
+  author     User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId   String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  /// Tam metin arama indeksi
+  search Unsupported("tsvector")?
+}
+
+model Attachment {
+  id         String    @id @default(cuid())
+  fileName   String
+  mime       String
+  size       Int
+  storedName String
+  task       Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId     String?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String?
+  uploader   User?     @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  uploaderId String?
+  createdAt  DateTime  @default(now())
+}
+
+model Reminder {
+  id       String   @id @default(cuid())
+  remindAt DateTime
+  sent     Boolean  @default(false)
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId   String
+
+  @@index([sent, remindAt])
+}
+
+model Notification {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  type       String
+  payload    Json
+  readAt     DateTime?
+  /// Read is not the same as done. Archiving is how the inbox gets emptied.
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, archivedAt, createdAt])
+}
+
+model Favorite {
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  kind      String
+  targetId  String
+  createdAt DateTime @default(now())
+
+  @@id([userId, kind, targetId])
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  email     String
+  role      Role     @default(EDITOR)
+  kind      String // 'project' | 'team'
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
+  team      Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String?
+  inviter   User?    @relation(fields: [inviterId], references: [id], onDelete: SetNull)
+  inviterId String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  @@index([email, status])
+}
+
+model ApiToken {
+  id         String    @id @default(cuid())
+  name       String
+  tokenHash  String    @unique
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+/// A named filter set. `query` is the URL query string the screen already
+/// uses, stored verbatim: the server never parses it, so adding a filter to
+/// the UI needs no migration here.
+model SavedView {
+  id        String   @id @default(cuid())
+  name      String
+  query     String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  /// Null means the view belongs to a screen that spans projects.
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
+  /// Visible to everyone who can open the project, not just its author.
+  shared    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+  @@index([projectId])
+}
+
+/// One row per notification type a user has changed. A missing row means the
+/// default, so an untouched account keeps behaving exactly as before.
+model NotificationPreference {
+  id     String  @id @default(cuid())
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  type   String
+  /// Whether it appears in the inbox at all.
+  inApp  Boolean @default(true)
+  /// Whether it also sends an immediate email.
+  email  Boolean @default(true)
+
+  @@unique([userId, type])
+}
