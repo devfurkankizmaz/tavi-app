@@ -17,7 +17,7 @@
     "screenshots": "npm run screenshots -w @tavi/api"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0",
+    "concurrently": "^9.2.5",
     "playwright-core": "^1.62.1"
   },
   "description": "Open-source, self-hosted task tracking for small teams. Projects, cycles, docs and an inbox, in one Docker command.",
